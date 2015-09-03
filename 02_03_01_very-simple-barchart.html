@@ -9,65 +9,97 @@
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
   <script>
+    var chartSize = {
+      width: 300,
+      height: 300
+    }
+
     var dataset = [
       {
-        name: 'Homer',
+        date: '13/09',
         amount: 6
       },{
-        name: 'Zeyno',
+        date: '14/09',
         amount: 13
       },{
-        name: 'Sara',
+        date: '15/09',
         amount: 15
       },{
-        name: 'Meral',
+        date: '16/09',
         amount: 2
       },{
-        name: 'Sinan',
+        date: '17/09',
         amount: 9
+      },{
+        date: '18/09',
+        amount: 27
+      },{
+        date: '19/09',
+        amount: 35
+      },{
+        date: '20/09',
+        amount: 1
+      },{
+        date: '21/09',
+        amount: 7
+      },{
+        date: '22/09',
+        amount: 4
+      },{
+        date: '23/09',
+        amount: 22
+      },{
+        date: '24/09',
+        amount: 12
+      },{
+        date: '25/09',
+        amount: 8
       }
     ];
 
-    var maxValue  = _.max(_.pluck(dataset, 'amount'));
-    console.log(maxValue);
+    // Utility Variables
+    var amountsArray = _.pluck(dataset, 'amount'),
+        maxValue  = _.max(amountsArray),
+        baseColor;
 
     // Siddetine gore renklendir
     var colorScale = d3.scale.linear()
                               .domain([0, maxValue])
                               .range(['orange','purple']);
-    /*
-    Siralamasina gore renklendirme
-    var colorScale = d3.scale.linear()
-                              .domain([0, dataset.length])
-                              .range(['orange','purple']);
-    */
 
-    var baseColor;
+    var xScale = d3.scale.ordinal()
+                          .domain(amountsArray)
+                          .rangeBands([0, 300], 0.1);
+
+    var yScale = d3.scale.linear()
+                          .domain([0, maxValue * 1.05])
+                          .range([0, chartSize.height]);
 
     d3.select('#chart')
         .append('svg')
-        .attr('width', 300)
-        .attr('height', 300)
+        .attr('width', chartSize.width)
+        .attr('height', chartSize.height)
         .style('background', '#eee')
         .selectAll('rect')
         .data(dataset)
         .enter()
           .append('rect')
-          .attr('width', 20)
-          .attr('height', function(d){
-            return d.amount * 7;
+          .attr('x', function(d,i){
+            return xScale(d.amount);
           })
-          .attr('x', function(d, i){
-            return i * 22;
-          })
+          .attr('width', xScale.rangeBand())
           .attr('y', function(d, i){
-            return 300 - d.amount * 7;
+            return chartSize.height - yScale(d.amount);
+          })
+          .attr('height', function(d){
+            return yScale(d.amount);
           })
           .attr('fill', function(d, i){
             // return colorScale(i); siralamaya gore oldugu zamana
             return colorScale(d.amount);
           })
           .on('mouseover', function(d){
+            console.log(d.amount);
             baseColor = d3.select(this).attr('fill');
             d3.select(this).attr('fill', 'red');
           })
