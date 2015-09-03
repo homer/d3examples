@@ -3,6 +3,14 @@
 <head>
   <meta charset="utf-8">
   <title>JS Bin</title>
+  <style>
+  .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+  }
+  </style>
 </head>
 <body>
   <div id="chart"></div>
@@ -11,7 +19,13 @@
   <script>
     var chartSize = {
       width: 300,
-      height: 300
+      height: 300,
+      margin: {
+        top: 20,
+        right: 20,
+        bottom: 60,
+        left: 60
+      }
     }
 
     var dataset = [
@@ -60,6 +74,10 @@
     // Utility Variables
     var amountsArray = _.pluck(dataset, 'amount'),
         maxValue  = _.max(amountsArray),
+        w = chartSize.width - chartSize.margin.left
+                            - chartSize.margin.right,
+        h = chartSize.height - chartSize.margin.top
+                            - chartSize.margin.bottom,
         baseColor;
 
     // Siddetine gore renklendir
@@ -69,17 +87,46 @@
 
     var xScale = d3.scale.ordinal()
                           .domain(amountsArray)
-                          .rangeBands([0, 300], 0.1);
+                          .rangeBands([0, w], 0.1);
 
     var yScale = d3.scale.linear()
                           .domain([0, maxValue * 1.05])
-                          .range([0, chartSize.height]);
+                          .range([0, h]);
 
-    d3.select('#chart')
-        .append('svg')
-        .attr('width', chartSize.width)
-        .attr('height', chartSize.height)
-        .style('background', '#eee')
+    var xAxis = d3.svg.axis()
+                      .scale(xScale)
+                      .orient('bottom')
+                      .ticks(5)
+                      .innerTickSize(3)
+                      .outerTickSize(6)
+                      .tickPadding(12);
+
+    var yAxis = d3.svg.axis()
+                      .scale(yScale)
+                      .orient('left');
+
+    var svg = d3.select('#chart')
+                .append('svg')
+                .attr('width', w + chartSize.margin.left
+                                 + chartSize.margin.right)
+                .attr('height', h + chartSize.margin.top
+                                  + chartSize.margin.bottom)
+                .style('background', '#eee')
+                .append('g')
+                .attr('transform', 'translate(' + chartSize.margin.left + ','
+                                                + chartSize.margin.top + ')');
+    svg.append('g')
+       .attr('class', 'x axis')
+       .attr('transform', 'translate(0,' + (h + 0) + ')')
+       .call(xAxis);
+
+    svg.append('g')
+       .attr('class', 'y axis')
+       .attr('transform','translate(0,0)')
+       .call(yAxis);
+
+    svg.append('g')
+        .attr('transform', 'translate(0,-80)')
         .selectAll('rect')
         .data(dataset)
         .enter()
@@ -92,6 +139,8 @@
             return chartSize.height - yScale(d.amount);
           })
           .attr('height', function(d){
+            // d3.select(this);
+            // console.log(yScale(d.amount));
             return yScale(d.amount);
           })
           .attr('fill', function(d, i){
@@ -105,7 +154,8 @@
           })
           .on('mouseout', function(d){
             d3.select(this).attr('fill', baseColor);
-          })
+          });
+
 
 
   </script>
