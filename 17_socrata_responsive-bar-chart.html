@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Socrata Responsive Bar Chart</title>
+  <style>
+  #chartArea {
+    width: 95%;
+    height: 400px;
+    margin: 0 auto;
+    overflow: scroll;
+    border: 1px solid black;
+    margin-top: 10px;
+  }
+  </style>
+</head>
+<body>
+  <div id="chartArea"></div>
+  <h1></h1>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script>
+$(document).ready(function(){
+  var svg, dataset, labels, w, useMinValues, minChartWidth;
+
+  var cssChartWidth = $('#chartArea').width();
+  var minBarWidth = 70;
+  var minBarWidthSeperationRatio = 0.1;
+  var minInitialSpacing = minBarWidth * minBarWidthSeperationRatio;
+
+  window.onorientationchange = readDeviceOrientation;
+  function readDeviceOrientation() {
+    if (Math.abs(window.orientation) === 90) {
+      // Landscape
+      console.log('in landscape mode');
+    } else {
+      // Portrait
+      console.log('in portrait mode');
+    }
+  }
+
+  /*
+  CSS'le belirlenen chart alani vs. min bar kalinligini karsilastir
+  or.
+  CSS ile belirlenen chart alani: 900px
+  Min bar kalingiligina(100px) gore chart alani (100px * 11bar = 1100px)
+  Min bar kalinligi daha buyukse w = min bar kalinligi
+  */
+  $.getJSON('./dataset.json', function(data){
+    dataset = data;
+    minChartWidth = minInitialSpacing +
+                      minBarWidth * dataset['langs'].length +
+                      minBarWidth * minBarWidthSeperationRatio * dataset['langs'].length; // bars spacing
+
+    if(minChartWidth > cssChartWidth) {
+      w = minChartWidth;
+      useMinValues = true;
+    } else {
+      w = cssChartWidth;
+      useMinValues = false;
+    }
+
+    svg = d3.select('#chartArea')
+            .append('svg')
+            .attr('width', w)
+            .attr('height',380);
+
+    var xScale = d3.scale.ordinal()
+                          .domain(_.pluck(dataset['langs'],'data'))
+                          .rangeBands([0, w],0.1,0.1);
+                          // rangeBand(toplam uzunluk, barlar arasi bosluk*, sag&sol koselerdeki bosluk*)
+
+    var maxObj = _.max(dataset['langs'], function(lang){ return lang.data; });
+
+    var yScale = d3.scale.linear()
+                    .domain([0, maxObj.data * 1.1])
+                    .range([0, 400]);
+
+    svg.selectAll('rect')
+        .data(dataset['langs'])
+        .enter()
+        .append('rect')
+        .attr('fill', 'teal')
+        .attr('x', function(d, i){
+          return xScale(d.data);
+        })
+        .attr('width', function(d){
+          if(xScale.rangeBand(d.data) < 20) {
+            return 20;
+          } else {
+            return xScale.rangeBand(d.data);
+          }
+        })
+        .attr('y', function(d){
+          return 400 - yScale(d.data);
+        })
+        .attr('height', function(d) {
+          return yScale(d.data);
+        })
+        .on('mousedown', function(d) {
+          d3.select(this).attr('fill', 'red');
+          $('h1').html('Details: ' + d.label + ', ' + d.data);
+        })
+        .on('mouseup', function(d) {
+          d3.select(this).attr('fill', 'teal');
+          $('h1').html('');
+        });
+  });
+
+  $(window).resize(function(){
+    cssChartWidth = $('#chartArea').width();
+
+    if(minChartWidth > cssChartWidth) {
+      useMinValues = true;
+      w = minChartWidth;
+    } else {
+      useMinValues = false;
+      w = cssChartWidth;
+    }
+
+    svg.attr('width', w);
+
+    var xScale = d3.scale.ordinal()
+                          .domain(_.pluck(dataset['langs'],'data'))
+                          .rangeBands([0, w],0.1,0.1);
+
+    svg.selectAll('rect')
+        .attr('x', function(d, i){
+          if(useMinValues) {
+            return (
+              minInitialSpacing + // initial chart spacing
+              i * minBarWidth +   // bar spacing
+              (minBarWidth * minBarWidthSeperationRatio * i) // bar seperator
+            );
+          } else {
+            return xScale(d.data);
+          }
+        })
+        .attr('width', function(d){
+          if(useMinValues) {
+            return minBarWidth;
+          } else {
+            return xScale.rangeBand(d.data);
+          }
+        })
+  });
+});
+</script>
+
+</body>
+</html>

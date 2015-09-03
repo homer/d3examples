@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+  <style>
+    svg {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hello World</h1>
+  <div id="chartArea"></div>
+  <script>
+  var chartConfig = {
+    width: 300,
+    height: 300,
+    barWidth: 20,
+    seperator: 2,
+    multiplier: 7,
+    barColor: '#f00'
+  }
+
+  var dataset = [
+  {
+    label: 'Ford',
+    data: 6
+  },{
+    label: 'VW',
+    data: 15
+  },{
+    label: 'Mercedes',
+    data: 34
+  },{
+    label: 'BMW',
+    data: 37
+  },{
+    label: 'Renault',
+    data: 9
+  }];
+
+  var svg =   d3.select('#chartArea')
+    .append('svg')
+    .attr('width', chartConfig.width)
+    .attr('height', chartConfig.height);
+
+  var chartBars = svg.selectAll('rect');
+
+  function init() {
+    console.log('init');
+    chartBars
+      .data(dataset)
+      .enter()
+      .append('rect');
+  }
+
+  function makeGeometry() {
+    console.log('geometry');
+    chartBars
+      .attr('x', function(d, i){
+        return (chartConfig.barWidth + chartConfig.seperator) * i;
+      })
+      .attr('y', function(d, i){
+        return (chartConfig.width - d.data * chartConfig.multiplier);
+      })
+      .attr('width', chartConfig.barWidth)
+      .attr('height', function(d) {
+        return d.data * chartConfig.multiplier + 'px';
+      })
+  }
+
+  function makeStyle() {
+    console.log('style');
+    chartBars.attr('fill', chartConfig.barColor);
+  }
+
+  init();
+  makeGeometry();
+  makeStyle();
+  </script>
+</body>
+</html>

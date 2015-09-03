@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <style>
+  .bar {
+    display: inline-block;
+    width: 20px;
+    background-color: #f00;
+    margin-right: 10px;
+  }
+  </style>
+</head>
+<body>
+  <h1>Hello World</h1>
+<script>
+  var dataset = [3,4,13,6];
+
+  d3.select('body')
+    .selectAll('div')
+    .data(dataset)
+    .enter()
+    .append('div')
+    .attr('class','bar')
+    .style('height', function(d){
+      return d * 7 + 'px';
+    })
+
+</script>
+</body>
+</html>

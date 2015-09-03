@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+  <title>D3 - Data Driven Documents</title>
+  <style>
+  body {
+    padding-top: 50px;
+    padding-left: 100px;
+  }
+  #chartArea {
+    background-color: #ccc;
+  }
+  .bar {
+    display: inline-block;
+    width: 20px;
+    margin-right: 2px;
+    fill: teal;
+  }
+  </style>
+</head>
+<body>
+<ul>
+  <li><b>d3.max(dataset)</b></li>
+</ul>
+<div id="chartArea"></div>
+<script>
+  var dataset = _.map(_.range(15), function(i){
+    return Math.random() * 100;
+  });
+
+  var w = 400, h = 300;
+
+  var svg = d3.select('#chartArea')
+              .append('svg')
+              .attr('width', w)
+              .attr('height', h);
+
+  var yScale = d3.scale.linear()
+                  .domain([0, d3.max(dataset) * 1.1 ])
+                  .range([0, h]);
+
+  var multiplier = 8;
+
+  svg.selectAll('rect')
+    .data(dataset)
+    .enter()
+    .append('rect')
+    .attr('class', 'bar')
+    .attr('x', function(d, i) {
+      return 22 * i;
+    })
+    .attr('y', function(d) {
+      return h - yScale(d);
+    })
+    .attr('width', 100)
+    .attr('height', function(d) {
+      return yScale(d);
+    })
+</script>
+</body>
+</html>

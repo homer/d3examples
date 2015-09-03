@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+<script src="https://cdn.rawgit.com/lodash/lodash/3.0.1/lodash.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+  <style>
+    svg {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h3 id="title"></h3>
+  <div id="chartArea"></div>
+  <script>
+  var chartConfig = {
+    width: 300,
+    height: 300,
+    barWidth: 20,
+    seperator: 2,
+    multiplier: 7,
+    barColor: 'teal'
+  }
+
+  var dataset = [
+  {
+    label: 'Ford',
+    data: 6
+  },{
+    label: 'VW',
+    data: 15
+  },{
+    label: 'Mercedes',
+    data: 34
+  },{
+    label: 'BMW',
+    data: 37
+  },{
+    label: 'Renault',
+    data: 9
+  }];
+
+  var dataMax = _.max(dataset, function(brand) {
+    return brand.data;
+  });
+
+  var xScale = d3.scale.ordinal()
+                        .domain(_.pluck(dataset,'data'))
+                        .rangeBands([0, chartConfig.width], 0.1, 0.1);
+
+  var yScale = d3.scale.linear()
+                        .domain([0, dataMax.data])
+                        .range([0, chartConfig.height]);
+
+  var svg =   d3.select('#chartArea')
+    .append('svg')
+    .attr('width', chartConfig.width)
+    .attr('height', chartConfig.height);
+
+  svg
+    .selectAll('rect')
+    .data(dataset)
+    .enter()
+    .append('rect')
+    .attr('x', function(d, i){
+      return xScale(d.data);
+    })
+    .attr('y', function(d, i){
+      return (chartConfig.width - yScale(d.data));
+    })
+    .attr('width', function(d,i) {
+      return xScale.rangeBand();
+    })
+    .attr('height', function(d) {
+      return yScale(d.data);
+    })
+    .attr('fill', chartConfig.barColor)
+    .on('mousedown', function(d){
+      d3.select(this).attr('fill', 'blue');
+      $('#title').html(d.label + ' ' + d.data);
+
+    })
+    .on('mouseup', function(d){
+      d3.select(this).attr('fill', 'teal');
+      $('#title').html('&nbsp;');
+    });
+
+  </script>
+</body>
+</html>

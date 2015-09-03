@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+  <title>D3 - Data Driven Documents</title>
+  <style>
+  body {
+    padding-top: 50px;
+    padding-left: 100px;
+  }
+  #chartArea svg {
+    background-color: #ccc;
+  }
+  .bar {
+    display: inline-block;
+    margin-right: 2px;
+  }
+  </style>
+</head>
+<body>
+<ul>
+  <li><b>quantile</b> metod ile styling opsionlarini bucketlara ayirabilirim</li>
+</ul>
+<div id="chartArea"></div>
+<script>
+  var dataset = _.map(_.range(100), function(i){
+    return Math.random() * 500;
+  });
+
+  var w = 400, h = 300;
+
+  var svg = d3.select('#chartArea')
+              .append('svg')
+              .attr('width', w)
+              .attr('height', h);
+
+  var xScale = d3.scale.ordinal()
+                        .domain(dataset)
+                        .rangeBands([0, w], 0.1, 0.3);
+
+  var yScale = d3.scale.linear()
+                  .domain([0, d3.max(dataset) * 1.1 ])
+                  .range([0, h]);
+
+  var colorScale = d3.scale.quantile()
+                  // .domain([0, dataset.length/4, dataset.length])
+                  .domain([0, 10, dataset.length - 10, dataset.length])
+                  .range(['orange', 'green', 'purple'])
+                  // .range(['orange', 'green', 'red','purple']);
+
+  svg.selectAll('rect')
+    .data(dataset)
+    .enter()
+    .append('rect')
+    .attr('class', 'bar')
+    .attr('x', function(d, i) {
+      return xScale(d);
+    })
+    .attr('y', function(d) {
+      return h - yScale(d);
+    })
+    .attr('width', xScale.rangeBand())
+    .attr('height', function(d) {
+      return yScale(d);
+    })
+    /*
+    // data valuesuna gore renklendirme
+    .attr('fill', function(d) {
+      return colorScale(d);
+    })
+    // data valuesuna gore renklendirme (shorthand form)
+    .attr('fill', colorScale)
+    */
+    .attr('fill', function(d, i) {
+      return colorScale(i);
+    });
+
+</script>
+</body>
+</html>

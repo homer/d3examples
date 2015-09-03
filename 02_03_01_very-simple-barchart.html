@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+</head>
+<body>
+  <div id="chart"></div>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+  <script>
+    var dataset = [
+      {
+        name: 'Homer',
+        amount: 6
+      },{
+        name: 'Zeyno',
+        amount: 13
+      },{
+        name: 'Sara',
+        amount: 15
+      },{
+        name: 'Meral',
+        amount: 2
+      },{
+        name: 'Sinan',
+        amount: 9
+      }
+    ];
+
+    var maxValue  = _.max(_.pluck(dataset, 'amount'));
+    console.log(maxValue);
+
+    // Siddetine gore renklendir
+    var colorScale = d3.scale.linear()
+                              .domain([0, maxValue])
+                              .range(['orange','purple']);
+    /*
+    Siralamasina gore renklendirme
+    var colorScale = d3.scale.linear()
+                              .domain([0, dataset.length])
+                              .range(['orange','purple']);
+    */
+
+    var baseColor;
+
+    d3.select('#chart')
+        .append('svg')
+        .attr('width', 300)
+        .attr('height', 300)
+        .style('background', '#eee')
+        .selectAll('rect')
+        .data(dataset)
+        .enter()
+          .append('rect')
+          .attr('width', 20)
+          .attr('height', function(d){
+            return d.amount * 7;
+          })
+          .attr('x', function(d, i){
+            return i * 22;
+          })
+          .attr('y', function(d, i){
+            return 300 - d.amount * 7;
+          })
+          .attr('fill', function(d, i){
+            // return colorScale(i); siralamaya gore oldugu zamana
+            return colorScale(d.amount);
+          })
+          .on('mouseover', function(d){
+            baseColor = d3.select(this).attr('fill');
+            d3.select(this).attr('fill', 'red');
+          })
+          .on('mouseout', function(d){
+            d3.select(this).attr('fill', baseColor);
+          })
+
+
+  </script>
+</body>
+</html>
