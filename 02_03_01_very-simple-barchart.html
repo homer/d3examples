@@ -73,12 +73,13 @@
 
     // Utility Variables
     var amountsArray = _.pluck(dataset, 'amount'),
+        labelsArray = _.pluck(dataset, 'date'),
         maxValue  = _.max(amountsArray),
         w = chartSize.width - chartSize.margin.left
                             - chartSize.margin.right,
         h = chartSize.height - chartSize.margin.top
                             - chartSize.margin.bottom,
-        baseColor;
+        baseColor, highlightColor = '#ffbe00';
 
     // Siddetine gore renklendir
     var colorScale = d3.scale.linear()
@@ -89,20 +90,32 @@
                           .domain(amountsArray)
                           .rangeBands([0, w], 0.1);
 
+
+    var xLabelScale = d3.scale.ordinal()
+                              .domain(labelsArray)
+                              .rangeBands([0, w]);
+
     var yScale = d3.scale.linear()
                           .domain([0, maxValue * 1.05])
                           .range([0, h]);
 
     var xAxis = d3.svg.axis()
-                      .scale(xScale)
+                      .scale(xLabelScale)
                       .orient('bottom')
-                      .ticks(5)
+                      .tickValues(xLabelScale.domain().filter(function(d,i){
+                        return !(i % 4);
+                      }))
                       .innerTickSize(3)
                       .outerTickSize(6)
-                      .tickPadding(12);
+                      .tickPadding(10);
+
+    // Dogal olarak ters olacaktir. O yuzden Axis scale'ini ayri ayarlamam lazim
+    var vGuideScale = d3.scale.linear()
+                              .domain([0, maxValue * 1.05])
+                              .range([h, 0]);
 
     var yAxis = d3.svg.axis()
-                      .scale(yScale)
+                      .scale(vGuideScale)
                       .orient('left');
 
     var svg = d3.select('#chart')
@@ -150,7 +163,7 @@
           .on('mouseover', function(d){
             console.log(d.amount);
             baseColor = d3.select(this).attr('fill');
-            d3.select(this).attr('fill', 'red');
+            d3.select(this).attr('fill', highlightColor);
           })
           .on('mouseout', function(d){
             d3.select(this).attr('fill', baseColor);
