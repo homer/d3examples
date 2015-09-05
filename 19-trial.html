@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+  <style>
+  .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+  }
+  </style>
+</head>
+<body>
+  <div id="chart"></div>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+  <script>
+    var chartSize = {
+      width: 300,
+      height: 300,
+      margin: {
+        top: 10,
+        right: 40,
+        bottom: 60,
+        left: 40
+      }
+    }
+
+    var dataset = [
+      {
+        date: '13/09',
+        amount: 6
+      },{
+        date: '14/09',
+        amount: 13
+      },{
+        date: '15/09',
+        amount: 15
+      },{
+        date: '16/09',
+        amount: 2
+      },{
+        date: '17/09',
+        amount: 9
+      },{
+        date: '18/09',
+        amount: 27
+      },{
+        date: '19/09',
+        amount: 35
+      },{
+        date: '20/09',
+        amount: 1
+      },{
+        date: '21/09',
+        amount: 7
+      },{
+        date: '22/09',
+        amount: 4
+      },{
+        date: '23/09',
+        amount: 22
+      },{
+        date: '24/09',
+        amount: 12
+      },{
+        date: '25/09',
+        amount: 8
+      }
+    ];
+
+    // Utility Variables
+    var amountsArray = _.pluck(dataset, 'amount'),
+        labelsArray = _.pluck(dataset, 'date'),
+        maxValue  = _.max(amountsArray),
+        w = chartSize.width - chartSize.margin.left
+                            - chartSize.margin.right,
+        h = chartSize.height - chartSize.margin.top
+                            - chartSize.margin.bottom,
+        baseColor, highlightColor = '#ffbe00';
+
+    var svg = d3.select('#chart')
+                .append('svg')
+                  .attr('width', w + chartSize.margin.left
+                                   + chartSize.margin.right)
+                  .attr('height', h + chartSize.margin.top
+                                    + chartSize.margin.bottom)
+                  .style('background', '#eee')
+                  .append('g')
+                    .attr('transform', 'translate(' + chartSize.margin.left + ','
+                                                    + chartSize.margin.top + ')');
+
+    svg.append('g')
+       .attr('transform', 'translate(0,-' + chartSize.margin.bottom + ')')
+       .append('rect')
+         .attr('x', 0)
+         .attr('y', 0)
+         .attr('width', 50)
+         .attr('height', 50)
+         .style('fill','#f00');
+
+
+  </script>
+</body>
+</html>

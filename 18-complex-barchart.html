@@ -21,10 +21,10 @@
       width: 300,
       height: 300,
       margin: {
-        top: 20,
-        right: 20,
+        top: 10,
+        right: 40,
         bottom: 60,
-        left: 60
+        left: 40
       }
     }
 
@@ -91,18 +91,18 @@
                           .rangeBands([0, w], 0.1);
 
 
-    var xLabelScale = d3.scale.ordinal()
+    var hGuideScale = d3.scale.ordinal()
                               .domain(labelsArray)
                               .rangeBands([0, w]);
 
     var yScale = d3.scale.linear()
-                          .domain([0, maxValue * 1.05])
+                          .domain([0, maxValue * 1.1])
                           .range([0, h]);
 
     var xAxis = d3.svg.axis()
-                      .scale(xLabelScale)
+                      .scale(hGuideScale)
                       .orient('bottom')
-                      .tickValues(xLabelScale.domain().filter(function(d,i){
+                      .tickValues(hGuideScale.domain().filter(function(d,i){
                         return !(i % 4);
                       }))
                       .innerTickSize(3)
@@ -111,7 +111,7 @@
 
     // Dogal olarak ters olacaktir. O yuzden Axis scale'ini ayri ayarlamam lazim
     var vGuideScale = d3.scale.linear()
-                              .domain([0, maxValue * 1.05])
+                              .domain([0, maxValue * 1.1])
                               .range([h, 0]);
 
     var yAxis = d3.svg.axis()
@@ -120,54 +120,54 @@
 
     var svg = d3.select('#chart')
                 .append('svg')
-                .attr('width', w + chartSize.margin.left
-                                 + chartSize.margin.right)
-                .attr('height', h + chartSize.margin.top
-                                  + chartSize.margin.bottom)
-                .style('background', '#eee')
-                .append('g')
-                .attr('transform', 'translate(' + chartSize.margin.left + ','
-                                                + chartSize.margin.top + ')');
+                  .attr('width', w + chartSize.margin.left
+                                   + chartSize.margin.right)
+                  .attr('height', h + chartSize.margin.top
+                                    + chartSize.margin.bottom)
+                  .style('background', '#eee')
+                  .append('g')
+                    .attr('transform', 'translate(' + chartSize.margin.left + ','
+                                                    + chartSize.margin.top + ')');
     svg.append('g')
        .attr('class', 'x axis')
-       .attr('transform', 'translate(0,' + (h + 0) + ')')
+       .attr('transform', 'translate(0,' + (h + chartSize.margin.top) + ')')
        .call(xAxis);
 
     svg.append('g')
        .attr('class', 'y axis')
-       .attr('transform','translate(0,0)')
+       .attr('transform','translate(0,' + chartSize.margin.top + ')')
        .call(yAxis);
 
     svg.append('g')
-        .attr('transform', 'translate(0,-80)')
-        .selectAll('rect')
-        .data(dataset)
-        .enter()
-          .append('rect')
-          .attr('x', function(d,i){
-            return xScale(d.amount);
-          })
-          .attr('width', xScale.rangeBand())
-          .attr('y', function(d, i){
-            return chartSize.height - yScale(d.amount);
-          })
-          .attr('height', function(d){
-            // d3.select(this);
-            // console.log(yScale(d.amount));
-            return yScale(d.amount);
-          })
-          .attr('fill', function(d, i){
-            // return colorScale(i); siralamaya gore oldugu zamana
-            return colorScale(d.amount);
-          })
-          .on('mouseover', function(d){
-            console.log(d.amount);
-            baseColor = d3.select(this).attr('fill');
-            d3.select(this).attr('fill', highlightColor);
-          })
-          .on('mouseout', function(d){
-            d3.select(this).attr('fill', baseColor);
-          });
+       .attr('transform', 'translate(0,-' + chartSize.margin.bottom + ')')
+       .selectAll('rect')
+       .data(dataset)
+       .enter()
+       .append('rect')
+         .attr('x', function(d,i){
+           return xScale(d.amount);
+         })
+         .attr('width', xScale.rangeBand())
+         .attr('y', function(d, i){
+           return chartSize.height - yScale(d.amount);
+         })
+         .attr('height', function(d){
+           // d3.select(this);
+           // console.log(yScale(d.amount));
+           return yScale(d.amount);
+         })
+         .attr('fill', function(d, i){
+           // return colorScale(i); siralamaya gore oldugu zamana
+           return colorScale(d.amount);
+         })
+         .on('mouseover', function(d){
+           console.log(d.amount);
+           baseColor = d3.select(this).attr('fill');
+           d3.select(this).attr('fill', highlightColor);
+         })
+         .on('mouseout', function(d){
+           d3.select(this).attr('fill', baseColor);
+         });
 
 
 
